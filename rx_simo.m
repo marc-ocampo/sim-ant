@@ -29,12 +29,18 @@ function yhat = rx_simo(H, x, n, snr_dB, div, mod)
     y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) + n(:,symb_idx) * snr;
   end
   
-  # Diversity
-  if strcmp(div, 'SelectionDiversity')
-    y_div = rx_div_sd(y, H);
+  % Diversity
+  if M > 1
+    % there is diversity
+    if strcmp(div, 'SelectionDiversity')
+      y_div = rx_div_sd(y, H);
+    else
+      printf("Unexpected diversity technique: %s\n", div)
+      y_div = zeros(1, N);
+    end
   else
-    printf("Unexpected diversity technique: %s\n", div)
-    y_div = zeros(1, N);
+    % no diversity
+    y_div = y;
   end
   
   # Decision Maker
