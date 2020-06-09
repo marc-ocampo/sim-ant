@@ -20,18 +20,18 @@ n1 = awgn(N, 1, N0);
 
 ber_nodiv = zeros(1, length(SNR_dB));
 ber_sd = zeros(1, length(SNR_dB));
+ber_mrc = zeros(1, length(SNR_dB));
 
 for snr_idx = 1:length(SNR_dB)
   % Receiver
   yhat_nodiv = rx_simo(H1, x, n1, SNR_dB(snr_idx), 'NoDiv', 'BPSK');
-  yhat_sd = rx_simo(H, x, n, SNR_dB(snr_idx), 'SelectionDiversity', 'BPSK');
+  yhat_sd = rx_simo(H, x, n, SNR_dB(snr_idx), 'SD', 'BPSK');
+  yhat_mrc = rx_simo(H, x, n, SNR_dB(snr_idx), 'MRC', 'BPSK');
   
   % Performance evaluation
-  err_count = numel(find(sym_stream ~= yhat_nodiv'));
-  ber_nodiv(snr_idx) = err_count / N;
-  
-  err_count = numel(find(sym_stream ~= yhat_sd'));
-  ber_sd(snr_idx) = err_count / N;
+  ber_nodiv(snr_idx) = perf_eval(sym_stream, yhat_nodiv);
+  ber_sd(snr_idx) = perf_eval(sym_stream, yhat_sd);
+  ber_mrc(snr_idx) = perf_eval(sym_stream, yhat_mrc);
 end
 
 % Plot the performance
@@ -40,8 +40,9 @@ figure
 semilogy(SNR_dB, ber_nodiv, '-+r');
 hold on
 semilogy(SNR_dB, ber_sd, '-*b');
+semilogy(SNR_dB, ber_mrc, '-og');
 grid on
-legend('No Diversity','2Rx SD')
+legend('No Diversity','2Rx SD', '2Rx MRC')
 xlabel('SNR (dB)')
 ylabel('BER')
 title('BPSK System on Rayleigh Channel')

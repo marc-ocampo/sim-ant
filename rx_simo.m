@@ -11,8 +11,10 @@
 %         n       is the MxN noise matrix where each row is assigned to one 
 %                   transmitted symbol
 %         snr_dB  is the signal to noise ratio in decibels
-%         div     is the diversity combining technique where 
-%                   'SelectionDiversity' is supported
+%         div     is the diversity combining technique where the following are
+%                   supported:
+%                     (1) 'SD' for Selection Diversity
+%                     (2) 'MRC' for Maximum Ratio Combining
 %         mod     is the modulation scheme to be used for the RX decision maker 
 %                   where 'BPSK' is supported
 % @output
@@ -31,24 +33,34 @@ function yhat = rx_simo(H, x, n, snr_dB, div, mod)
   
   % Diversity
   if M > 1
-    % there is diversity
-    if strcmp(div, 'SelectionDiversity')
-      y_div = rx_div_sd(y, H);
-    else
-      printf("Unexpected diversity technique: %s\n", div)
-      y_div = zeros(1, N);
-    end
+    y_div = apply_diversity(N, y, H, div);
   else
-    % no diversity
     y_div = y;
   end
   
-  # Decision Maker
+  yhat = apply_rx_decision_maker(mod, y_div, N);
+endfunction
+
+% Private function intended to be used by rx_simo()
+function y_div = apply_diversity(N, y, H, div)
+  y_div = zeros(1, N);
+
+  if strcmp(div, 'SD')
+    y_div = rx_div_sd(y, H);
+  elseif strcmp(div, 'MRC')
+    y_div = rx_div_mrc(y, H);
+  else
+    printf("Unexpected diversity technique: %s\n", div)
+  end
+endfunction
+
+% Private function intended to be used by rx_simo()
+function yhat = apply_rx_decision_maker(mod, y_div, N)
+  yhat = zeros(1, N);
+
   if strcmp(mod, 'BPSK')
     yhat = bpsk_rx_decision_maker(y_div);
   else
     printf("Unexpected modulation scheme: %s\n", mod)
-    yhat = zeros(1, N);
   end
-  
 endfunction
