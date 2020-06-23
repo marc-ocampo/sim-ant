@@ -1,2 +1,1 @@
-# ant-diversity-combining
-A simulation of different antenna diversity combining techniques
+Different Antenna Simulations implemented in GNU Octave
