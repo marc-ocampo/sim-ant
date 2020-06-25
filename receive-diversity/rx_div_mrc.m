@@ -16,6 +16,7 @@ function y_div = rx_div_mrc(y, H)
   y_div = zeros(1, N);
   
   for symb_idx = 1 : N
-    y_div(1, symb_idx) = y(:, symb_idx)' * H(:, symb_idx) / norm(H(:, symb_idx));
+    h = H(:, symb_idx);
+    y_div(1, symb_idx) = y(:, symb_idx)' * h / norm(h);
   endfor  
 endfunction
