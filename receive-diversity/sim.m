@@ -9,7 +9,8 @@ N0 = 1              % noise power (not in dB, 1 > P > 0)
 SNR_dB = 0:2:18     % signal to noise ratio in decibels
 
 % BPSK Transmitter Model
-[x, sym_stream] = bpsk_generator(N); % Nx1
+sym_stream = bitstream_generator(N);
+x = bpsk_generator(sym_stream); % Nx1
 
 % Channel and Noise Model
 H = rayleigh_channel(N, M, P); % MxN
