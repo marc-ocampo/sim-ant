@@ -29,9 +29,17 @@ for idx = 1:length(symb_pow)
   pow = symb_pow(idx);
 
   % Receiver
-  yhat_nodiv = rx_simo(H, x, n, pow, N0, 'NoDiv', 'BPSK');
-  yhat_sd = rx_simo(H, x, n, pow, N0, 'SD', 'BPSK');
-  yhat_mrc = rx_simo(H, x, n, pow, N0, 'MRC', 'BPSK');
+  y = receiver(H, x, n, pow, N0);
+
+  % Receive Diversity
+  y_div_nodiv = rx_no_div(y, H);
+  y_div_sd = rx_div_sd(y, H);
+  y_div_mrc = rx_div_mrc(y, H);
+
+  % RX Decision Maker
+  yhat_nodiv = bpsk_rx_decision_maker(y_div_nodiv);
+  yhat_sd = bpsk_rx_decision_maker(y_div_sd);
+  yhat_mrc = bpsk_rx_decision_maker(y_div_mrc);
 
   % Performance evaluation
   ber_nodiv(idx) = compute_ber(sym_stream, yhat_nodiv);
