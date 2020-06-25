@@ -24,20 +24,17 @@
 
 function yhat = rx_simo(H, x, n, P, N0, div, mod)
   [M, N] = size(H);
+  if strcmp(mod, 'NoDiv')
+    M = 1;
+  end
   y = zeros(M, N); % container of N symbols received from each of the M antenna
   
   for symb_idx = 1:N  % try to improve through vectorization
     y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) * P + n(:,symb_idx) * N0;
   end
-  
-  % Diversity
-  if M > 1
-    y_div = apply_diversity(N, y, H, div);
-  else
-    y_div = y;
-  end
-  
-  yhat = apply_rx_decision_maker(mod, y_div, N);
+
+  ydiv = apply_diversity(N, y, H, div);
+  yhat = apply_rx_decision_maker(mod, ydiv, N);
 endfunction
 
 % Private function intended to be used by rx_simo()
@@ -48,6 +45,8 @@ function y_div = apply_diversity(N, y, H, div)
     y_div = rx_div_sd(y, H);
   elseif strcmp(div, 'MRC')
     y_div = rx_div_mrc(y, H);
+  elseif strcmp(div, 'NoDiv')
+    y_div = rx_no_div(y, H);
   else
     printf("Unexpected diversity technique: %s\n", div)
   end

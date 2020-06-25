@@ -24,16 +24,13 @@ x = bpsk_generator(sym_stream); % Nx1
 H = rayleigh_channel(N, M, P); % MxN
 n = awgn(N, M, N0); % MxN
 
-H1 = rayleigh_channel(N, 1, P); % SISO model (no diversity)
-n1 = awgn(N, 1, N0);
-
 for snr_idx = 1:length(SNR)
   % Get signal power from SNR and noise power
   snr = SNR(snr_idx);
   pow = snr * N0;
 
   % Receiver
-  yhat_nodiv = rx_simo(H1, x, n1, pow, N0, 'NoDiv', 'BPSK');
+  yhat_nodiv = rx_simo(H, x, n, pow, N0, 'NoDiv', 'BPSK');
   yhat_sd = rx_simo(H, x, n, pow, N0, 'SD', 'BPSK');
   yhat_mrc = rx_simo(H, x, n, pow, N0, 'MRC', 'BPSK');
 
