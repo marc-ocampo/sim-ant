@@ -29,9 +29,10 @@ function yhat = rx_simo(H, x, n, P, N0, div, mod)
   end
   y = zeros(M, N); % container of N symbols received from each of the M antenna
   
-  for symb_idx = 1:N  % try to improve through vectorization
-    y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) * P + n(:,symb_idx) * N0;
-  end
+%  for symb_idx = 1:N  % try to improve through vectorization
+%    y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) * P + n(:,symb_idx) * N0;
+%  end
+  y = (H .* x' * P) + (n * N0); % vectorized form
 
   ydiv = apply_diversity(N, y, H, div);
   yhat = apply_rx_decision_maker(mod, ydiv, N);
