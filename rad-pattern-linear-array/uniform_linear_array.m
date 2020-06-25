@@ -17,8 +17,7 @@ endfunction
 
 function r = efficient_ula(theta, N, d, lambda) % vectorized
   n = transpose(1 : N);
-  r_prime = exp(-j * 2 * pi * (n - 1) * d * cos(theta) / lambda)
-  size(r_prime)
+  r_prime = exp(-j * 2 * pi * (n - 1) * d * cos(theta) / lambda);
   r = ones(1,N) * r_prime;  
 endfunction
 
