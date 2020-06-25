@@ -2,6 +2,7 @@
 % N is the number of antenna elements
 % d is the distance between antenna elements
 % lambda is the carrier wavelength
+% delay is the time delay on the 1st adjacent antenna element
 
 % OUTPUT
 % theta is the angle vector
@@ -10,21 +11,24 @@
 % REFERENCE
 % http://www.raymaps.com/index.php/fundamentals-of-a-uniform-linear-array-ula/
 
-function [theta, r] = uniform_linear_array(N, d, lambda)
+function [theta, r] = uniform_linear_array(N, d, lambda, delay=0)
   theta = 0:pi/180:2*pi;
-  r = efficient_ula(theta, N, d, lambda);
+  r = efficient_ula(theta, N, d, lambda, delay);
 endfunction
 
-function r = efficient_ula(theta, N, d, lambda) % vectorized
+function r = efficient_ula(theta, N, d, lambda, delay) % vectorized
   n = transpose(1 : N);
   r_prime = exp(-j * 2 * pi * (n - 1) * d * cos(theta) / lambda);
-  r = ones(1,N) * r_prime;  
+  r_prime = r_prime .* exp(-j * (n - 1) * delay);
+  r = ones(1,N) * r_prime * exp(-j * delay);
 endfunction
 
-function r = inefficient_ula(theta, N, d, lambda) % via for-loop
+function r = inefficient_ula(theta, N, d, lambda, delay) % via for-loop
   r = zeros(1, length(theta));
 
   for n = 1:N
     r = r + exp(-j * 2 * pi * (n - 1) * d * cos(theta) / lambda);
+    % each antenna element has increasing delay
+    r = r * exp(-j * (n - 1) * delay);
   endfor
 endfunction

@@ -66,3 +66,36 @@ title('Effect of Number of Antenna Elements to the Radiation Pattern')
 % Increasing the number of antenna elements in a uniform linear configuration
 % makes the radiation pattern directive
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear all
+clc
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EFFECT OF TIME DELAYS TO THE RADIATION PATTERN
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+f = 3.8e9;      # carrier frequency (Hz)
+N = 4;          # number of antenna element
+color_code = ['b', 'r', 'g', 'y', 'c' ,'m' ,'k'];
+
+lambda = 3e8 / f; # wavelength
+d = lambda / 2;   # inter-antenna element distance
+delay = d .* [-30 -20 -10 1 10 20 30];
+
+figure;
+for idx = 1 : length(delay)
+  [theta, r] = uniform_linear_array(N, d, lambda, delay(idx));
+  
+  if 2 == idx
+    hold on
+  endif
+  
+  polar(theta, abs(r), color_code(idx));
+endfor
+hold off
+legend('-30d','-20d','-10d','d','10d','20','30d')
+title('Effect of Antenna Element Delays to the Radiation Pattern')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CONCLUSION
+% <>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
