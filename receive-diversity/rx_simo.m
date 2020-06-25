@@ -10,7 +10,8 @@
 %         x       is the Nx1 modulated symbol stream
 %         n       is the MxN noise matrix where each row is assigned to one 
 %                   transmitted symbol
-%         snr_dB  is the signal to noise ratio in decibels
+%         P       is the symbol power
+%         N0      is the noise power
 %         div     is the diversity combining technique where the following are
 %                   supported:
 %                     (1) 'SD' for Selection Diversity
@@ -21,14 +22,12 @@
 %         yhat  is the 1xN symbol stream vector
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function yhat = rx_simo(H, x, n, snr_dB, div, mod)
-  snr = 10^(-snr_dB / 10);
-  
+function yhat = rx_simo(H, x, n, P, N0, div, mod)
   [M, N] = size(H);
   y = zeros(M, N); % container of N symbols received from each of the M antenna
   
   for symb_idx = 1:N  % try to improve through vectorization
-    y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) + n(:,symb_idx) * snr;
+    y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) * P + n(:,symb_idx) * N0;
   end
   
   % Diversity
