@@ -6,8 +6,11 @@
 %   highest SNR.
 % (2) Find the index of those chosen symbols from y to use on H and generate the
 %   a new channel vector as a subset of the H matrix.
-% (3) Use the chosen antenna per symbol, new channel vector, and the norm of the
-%   channel vector to perform the matched filtering.
+% (3) Use the chosen antenna per symbol and the new channel vector to obtain the
+%   received signal (removing the channel attenuation and phase shifts)
+%
+% Reference
+% http://www.dsplog.com/2008/09/06/receiver-diversity-selection-diversity/
 %
 % @input
 %         y           is the MxN received signal matrix
@@ -20,14 +23,14 @@ function y_sd = rx_div_sd(y, H)
   N = size(y)(2);
   y_sd = zeros(1, N);
 
-  % y_sd = inefficient_sd(y, H, N); % vectorize
+%   y_sd = inefficient_sd(y, H, N); % vectorize
   y_sd = max(y); %1
 
   [row,col] = find(y_sd == y); %2
   indices = sub2ind(size(H), row, col);
-  new_H = H(indices)';
+  new_H = conj(H(indices)');
 
-  y_sd = y_sd .* new_H / norm(new_H); %3
+  y_sd = y_sd ./ new_H; %3
 endfunction
 
 function ydiv = inefficient_sd(y, H, N)
