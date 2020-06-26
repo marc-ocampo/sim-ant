@@ -24,5 +24,5 @@ function y = receiver(H, x, n, P, N0)
   %    y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) * P + n(:,symb_idx) * N0;
   %  end
 
-  y = (H .* x' * P) + (n * N0); % vectorized form
+  y = (H .* transpose(x) * P) + (n * N0); % vectorized form
 endfunction

@@ -12,5 +12,5 @@
 
 function n = awgn(N, M, N0)
   n = sqrt(N0/2) * randn(M, N); % no imag component since no phase rotation
-  printf("n_size = %dx%d\n",size(n)(1), size(n)(2));
+  printf("size(n) = %dx%d\n",size(n)(1), size(n)(2));
 endfunction

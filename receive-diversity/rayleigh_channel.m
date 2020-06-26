@@ -25,5 +25,5 @@ function H = rayleigh_channel(N, M, P)
   C = eye(M);
   a = randn(M, N) + 1i * randn(M, N);
   H = phi * C * sqrt(P) * a;
-  printf("H_size = %dx%d\n",size(H)(1), size(H)(2));
+  printf("size(H) = %dx%d\n",size(H)(1), size(H)(2));
 endfunction

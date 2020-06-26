@@ -2,12 +2,11 @@
 % Selection Diversity
 %
 % Upon receiving symbols from different antenna, select 1 with the highest SNR.
-% (1) For each MxN received signal y, select 1 symbol per antenna with the
-%   highest SNR.
-% (2) Find the index of those chosen symbols from y to use on H and generate the
-%   a new channel vector as a subset of the H matrix.
-% (3) Use the chosen antenna per symbol and the new channel vector to obtain the
-%   received signal (removing the channel attenuation and phase shifts)
+% (1) For each M received signal y, select 1 symbol among M antenna with the
+%   highest SNR (or the largest h)
+% (2) Find the index of those chosen symbols from h to use on y and generate the
+%   chosen received signal vector from 1 antenna
+% (3) Equalize the chosen symbols by using the h vector from (1)
 %
 % Reference
 % http://www.dsplog.com/2008/09/06/receiver-diversity-selection-diversity/
@@ -24,13 +23,13 @@ function y_sd = rx_div_sd(y, H)
   y_sd = zeros(1, N);
 
 %   y_sd = inefficient_sd(y, H, N); % vectorize
-  y_sd = max(y); %1
+%  y_sd = max(y); %1
 
-  [row,col] = find(y_sd == y); %2
-  indices = sub2ind(size(H), row, col);
-  new_H = conj(H(indices)');
-
-  y_sd = y_sd ./ new_H; %3
+  h = max(H);
+  [row,col] = find(h == H);
+  indices = sub2ind(size(y), row, col);
+  y_sd = transpose(y(indices));
+  y_sd = y_sd ./ h;
 endfunction
 
 function ydiv = inefficient_sd(y, H, N)

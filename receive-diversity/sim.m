@@ -3,9 +3,9 @@ clc
 
 % Test Parameters
 N = 10^3            % number of symbols (> 0)
-M = 2               % number of receive antenna (> 0)
-P = 10^-3           % channel power (not in dB, 1 > P > 0)
-N0 = 1              % noise power (not in dB, 1 > N0 > 0)
+M = 4               % number of receive antenna (> 0)
+P = 10^-5           % channel power (not in dB, 1 > P > 0)
+N0 = 10^-1          % noise power (not in dB, 1 > N0 > 0)
 SNR_dB = 0:2:18     % signal to noise ratio in decibels
 num_tech = 3;       % no diversity, selective diversity, MRC
 
@@ -59,7 +59,7 @@ for tech_idx = 1:num_tech
 end
 hold off
 grid on
-legend('No Diversity','2Rx SD', '2Rx MRC')
+legend('No Diversity','4Rx SD', '4Rx MRC')
 xlabel('SNR (dB)')
 ylabel('BER')
 title('BPSK System on Rayleigh Channel')
