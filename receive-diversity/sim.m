@@ -63,15 +63,3 @@ legend('No Diversity','2Rx SD', '2Rx MRC')
 xlabel('SNR (dB)')
 ylabel('BER')
 title('BPSK System on Rayleigh Channel')
-
-
-
-
-
-
-
-
-
-
-
-
