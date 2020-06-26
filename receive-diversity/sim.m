@@ -7,11 +7,10 @@ M = 2               % number of receive antenna (> 0)
 P = 10^-3           % channel power (not in dB, 1 > P > 0)
 N0 = 1              % noise power (not in dB, 1 > N0 > 0)
 SNR_dB = 0:2:18     % signal to noise ratio in decibels
+num_tech = 3;       % no diversity, selective diversity, MRC
 
-% Initialie BER counters
-ber_nodiv = zeros(1, length(SNR_dB));
-ber_sd = zeros(1, length(SNR_dB));
-ber_mrc = zeros(1, length(SNR_dB));
+% Initialize BER counters here each row is the BER for a combining technique
+ber = zeros(num_tech, length(SNR_dB));
 
 % Translate SNRdB to symbol power
 SNR = 10.^(SNR_dB / 10);
@@ -32,28 +31,33 @@ for idx = 1:length(symb_pow)
   y = receiver(H, x, n, pow, N0);
 
   % Receive Diversity
-  y_div_nodiv = rx_no_div(y, H);
-  y_div_sd = rx_div_sd(y, H);
-  y_div_mrc = rx_div_mrc(y, H);
+  y_div = zeros(num_tech, N);
+  y_div(1, :) = rx_no_div(y, H);
+  y_div(2, :) = rx_div_sd(y, H);
+  y_div(3, :) = rx_div_mrc(y, H);
 
-  % RX Decision Maker
-  yhat_nodiv = bpsk_rx_decision_maker(y_div_nodiv);
-  yhat_sd = bpsk_rx_decision_maker(y_div_sd);
-  yhat_mrc = bpsk_rx_decision_maker(y_div_mrc);
+  yhat = zeros(1, N); % placeholder
+  for tech_idx = 1:num_tech
+    % RX Decision Maker
+    yhat = bpsk_rx_decision_maker(y_div(tech_idx, :));
 
-  % Performance evaluation
-  ber_nodiv(idx) = compute_ber(sym_stream, yhat_nodiv);
-  ber_sd(idx) = compute_ber(sym_stream, yhat_sd);
-  ber_mrc(idx) = compute_ber(sym_stream, yhat_mrc);
+    % BER Computation
+    ber(tech_idx, idx) = compute_ber(sym_stream, yhat);
+  end
 end
 
 % Plot the performance
-close all
+labels = ['-+r', '-*b', '-og'];
 figure
-semilogy(SNR_dB, ber_nodiv, '-+r');
-hold on
-semilogy(SNR_dB, ber_sd, '-*b');
-semilogy(SNR_dB, ber_mrc, '-og');
+for tech_idx = 1:num_tech
+  if 2 == tech_idx
+    hold on
+  endif
+
+  label_idx = ((tech_idx - 1) * 3) + 1;
+  semilogy(SNR_dB, ber(tech_idx, :), labels(label_idx : label_idx+2));
+end
+hold off
 grid on
 legend('No Diversity','2Rx SD', '2Rx MRC')
 xlabel('SNR (dB)')
