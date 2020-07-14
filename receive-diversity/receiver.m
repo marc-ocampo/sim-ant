@@ -19,10 +19,18 @@
 function y = receiver(H, x, n, P, N0)
   [M, N] = size(H);
   y = zeros(M, N);
+  
+  y = efficient_receiver(H, x, n, P, N0);
+endfunction
 
-  %  for symb_idx = 1:N  % try to improve through vectorization
-  %    y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) * P + n(:,symb_idx) * N0;
-  %  end
+% efficient version of inefficient_receiver by utilizing vectorization
+function y = efficient_receiver(H, x, n, P, N0)
+  y = (H .* transpose(x) * P) + (n * N0); 
+endfunction
 
-  y = (H .* transpose(x) * P) + (n * N0); % vectorized form
+% used originally due to its intuitiveness but is inefficient due to the loops
+function y = inefficient_receiver(N, H, x, n, P, N0)
+  for symb_idx = 1:N
+    y(:,symb_idx) = H(:,symb_idx) * x(symb_idx) * P + n(:,symb_idx) * N0;
+  end
 endfunction
