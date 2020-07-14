@@ -22,23 +22,35 @@ function y_sd = rx_div_sd(y, H)
   N = size(y)(2);
   y_sd = zeros(1, N);
 
-%   y_sd = inefficient_sd(y, H, N); % vectorize
-%  y_sd = max(y); %1
-
-  h = max(H);
-  [row,col] = find(h == H);
-  indices = sub2ind(size(y), row, col);
-  y_sd = transpose(y(indices));
-  y_sd = y_sd ./ h;
+  y_sd = efficient_sd(y, H);
 endfunction
 
-function ydiv = inefficient_sd(y, H, N)
+% efficient version of inefficient_sd by utilizing vectorization
+function ydiv = efficient_sd(y, H)
+  % Find the max channel per column (or symbol)
+  h = max(H);
+
+  % Find the indices of the max values found in the channel matrix
+  [row,col] = find(h == H);
+
+  % Convert those row-column indices as serial indices
+  indices = sub2ind(size(y), row, col);
+
+  % Choose the received signal based on the serial indices
+  ydiv = transpose(y(indices));
+
+  % Match the received signal with the estimated channel
+  ydiv = ydiv ./ h;
+endfunction
+
+% used originally due to its intuitiveness but is inefficient due to the loops
+function ydiv = inefficient_sd(N, y, H)
   for symb_idx = 1 : N
-    % Choose the antenna with the highest SNR
-    ydiv(1, symb_idx) = max(y(:,symb_idx));
+    % Choose the antenna with the highest SNR (or attenuation is lowest)
+    % We do not base on y because it involves the power from the transmitter
+    [h_max, ant_idx] = max(H(:,symb_idx));
 
     % Match the received signal with the estimated channel
-    ant_idx = find(ydiv(1, symb_idx)==y(:,symb_idx));
-    ydiv(1, symb_idx) = ydiv(1, symb_idx) / H(ant_idx, symb_idx);
-  endfor  
+    ydiv(1, symb_idx) = y(ant_idx, symb_idx) / h_max;
+  endfor
 endfunction
